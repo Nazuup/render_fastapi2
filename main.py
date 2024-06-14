@@ -2,6 +2,8 @@ from typing import Optional
 
 from fastapi import FastAPI
 
+from fastapi.responses import HTMLResponse #インポート
+
 import random  # randomライブラリを追加
 
 app = FastAPI()
@@ -30,4 +32,27 @@ def omikuji():
         "大凶"
     ]
 
-    return omikuji_list[random.randrange(10)]
+    return {"result" : omikuji_list[random.randrange(10)]}
+
+@app.get("/index")
+def index():
+    html_content = """
+    <html>
+        <head>
+            <title>Hello!</title>
+        </head>
+        <body>
+            <ul>
+                <li>root … "Hello World!"が出力される</li>
+                <li>/items/{item_id} … item_idとqueryが表示される</li>
+                <li>/omikuji … おみくじが引ける(毎回結果が変わる)</li>
+                <li>/index … html表示する</li>
+                <li>/present … メールを表示する
+        </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content, status_code=200)
+
+@app.post("/present")
+async def new_naming(mail):
+    return {"response": f"メールが届きました。内容は「{mail}」です。"}
